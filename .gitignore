@@ -1,0 +1,8 @@
+.venv/
+__pycache__/
+/reports/
+eval_harness/reports/*
+!eval_harness/reports/baseline.json
+!eval_harness/reports/retrieval_report.json
+data/memory/sessions/
+.env

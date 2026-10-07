@@ -1,0 +1,132 @@
+# FM AgentOps Phase 2 - Cloud Build CI/CD
+#
+# Pipeline: unit tests -> release gate -> reuse local evaluation -> build -> optional deploy
+#
+# By default Cloud Build runs pytest and the gate against eval_report.json generated
+# by ./scripts/ci_release.sh and included through .gcloudignore. This avoids Vertex
+# rate-limit instability while still blocking reports produced by a bad prompt.
+#
+# Local invocation:
+#   ./scripts/ci_release.sh        # Generate eval_report.json locally
+#   ./scripts/submit_ci_build.sh   # Submit pytest + gate + build + deploy
+#
+# Run tests and gates without deployment:
+#   gcloud builds submit --config=deployment/cloudbuild-ci.yaml \
+#     --substitutions=_DEPLOY=false
+#
+# Run evaluation in Cloud Build (slower and susceptible to 429s):
+#   --substitutions=_SKIP_AGENT_EVAL=false
+#
+# Image tags use the unique $BUILD_ID because $SHORT_SHA is empty for local submissions.
+
+substitutions:
+  _REGION: us-central1
+  _SERVICE_NAME: fm-agentops
+  _REPO_NAME: fm-agentops
+  _DEPLOY: "true"             # false = test only
+  _EVAL_DATASET: all          # alarm_cases | all; used when _SKIP_AGENT_EVAL=false
+  _SKIP_AGENT_EVAL: "true"    # true = reuse local eval_report.json and run gates only
+  _USE_MCP_TOOLS: "1"         # Enable MCP tool servers for Cloud Run integration
+  _MCP_TOOL_TIMEOUT_SECONDS: "30"
+  _ENABLE_CLOUD_TRACE: "0"    # Sprint 4: optionally enable Cloud Trace export
+  _ENABLE_BIGQUERY: "0"       # Sprint 4: optionally enable BigQuery export
+  _BIGQUERY_DATASET: fm_agentops_observability
+
+options:
+  logging: CLOUD_LOGGING_ONLY
+  machineType: E2_HIGHCPU_8
+timeout: 3600s
+
+steps:
+  # Step 1: unit tests, evaluation, and gates; a gate failure stops the build.
+  - id: test-eval-gate
+    name: python:3.11-slim-bookworm
+    entrypoint: bash
+    args:
+      - -c
+      - |
+        set -euo pipefail
+        apt-get update -qq
+        apt-get install -y --no-install-recommends ca-certificates git
+        # Installing uv with pip is more reliable in Cloud Build than curl | sh.
+        pip install --no-cache-dir uv
+        command -v uv
+        uv --version
+        test -f uv.lock || { echo "[ci] BLOCK: uv.lock is missing; run uv lock and include it"; exit 1; }
+        test -f eval_harness/reports/baseline.json || { echo "[ci] BLOCK: baseline.json is missing"; exit 1; }
+        if [[ "${_SKIP_AGENT_EVAL}" == "true" ]]; then
+          test -f eval_harness/reports/eval_report.json || {
+            echo "[ci] BLOCK: _SKIP_AGENT_EVAL=true but eval_report.json is missing";
+            echo "[ci] Run ./scripts/ci_release.sh locally and include eval_report.json";
+            exit 1;
+          }
+        fi
+        SKIP_AGENT_EVAL=$( [[ "${_SKIP_AGENT_EVAL}" == "true" ]] && echo 1 || echo 0 ) \
+          bash scripts/ci_release.sh
+    env:
+      - GOOGLE_CLOUD_PROJECT=$PROJECT_ID
+      - GOOGLE_CLOUD_LOCATION=${_REGION}
+      - GOOGLE_GENAI_USE_VERTEXAI=true
+      - EVAL_DATASET=${_EVAL_DATASET}
+      - EVAL_CASE_DELAY_SECONDS=90
+      - EVAL_CASE_MAX_RETRIES=12
+      - EVAL_CASE_RETRY_MAX_WAIT=600
+      - EVAL_RATE_LIMIT_COOLDOWN=180
+
+  # Step 2: build the Docker image
+  - id: build-image
+    name: gcr.io/cloud-builders/docker
+    waitFor:
+      - test-eval-gate
+    args:
+      - build
+      - -f
+      - deployment/Dockerfile
+      - -t
+      - ${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPO_NAME}/${_SERVICE_NAME}:$BUILD_ID
+      - -t
+      - ${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPO_NAME}/${_SERVICE_NAME}:latest
+      - .
+
+  # Step 3: push the image to Artifact Registry before deployment
+  - id: push-image
+    name: gcr.io/cloud-builders/docker
+    waitFor:
+      - build-image
+    args:
+      - push
+      - ${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPO_NAME}/${_SERVICE_NAME}:$BUILD_ID
+
+  # Step 4: deploy Cloud Run unless _DEPLOY=false
+  - id: deploy-cloud-run
+    name: gcr.io/google.com/cloudsdktool/cloud-sdk:slim
+    waitFor:
+      - push-image
+    entrypoint: bash
+    args:
+      - -c
+      - |
+        set -euo pipefail
+        if [[ "${_DEPLOY}" != "true" ]]; then
+          echo "[ci] _DEPLOY=${_DEPLOY}; skipping Cloud Run deployment"
+          exit 0
+        fi
+        IMAGE="${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO_NAME}/${_SERVICE_NAME}:${BUILD_ID}"
+        gcloud run deploy "${_SERVICE_NAME}" \
+          --image "$$IMAGE" \
+          --region "${_REGION}" \
+          --project "${PROJECT_ID}" \
+          --allow-unauthenticated \
+          --timeout=300 \
+          --memory=2Gi \
+          --cpu=1 \
+          --min-instances=0 \
+          --max-instances=3 \
+          --set-env-vars "GOOGLE_CLOUD_PROJECT=${PROJECT_ID},GOOGLE_CLOUD_LOCATION=${_REGION},GOOGLE_GENAI_USE_VERTEXAI=true,GEMINI_MODEL=gemini-2.5-flash,USE_MCP_TOOLS=${_USE_MCP_TOOLS},MCP_TOOL_TIMEOUT_SECONDS=${_MCP_TOOL_TIMEOUT_SECONDS},ENABLE_CLOUD_TRACE=${_ENABLE_CLOUD_TRACE},ENABLE_BIGQUERY=${_ENABLE_BIGQUERY},BIGQUERY_DATASET=${_BIGQUERY_DATASET}"
+        echo "[ci] Deployed with USE_MCP_TOOLS=${_USE_MCP_TOOLS} ENABLE_CLOUD_TRACE=${_ENABLE_CLOUD_TRACE} ENABLE_BIGQUERY=${_ENABLE_BIGQUERY}"
+        echo "[ci] Deployed: $$(gcloud run services describe ${_SERVICE_NAME} \
+          --region ${_REGION} --project ${PROJECT_ID} --format='value(status.url)')"
+
+images:
+  - ${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPO_NAME}/${_SERVICE_NAME}:$BUILD_ID
+  - ${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPO_NAME}/${_SERVICE_NAME}:latest

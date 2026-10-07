@@ -1,0 +1,198 @@
+[
+  {
+    "case_id": "rag_001",
+    "case_category": "rag",
+    "input": "What filter replacement policy applies to recurring filter pressure alarms on AHU-2F-01? Investigate history and cite the governing policy.",
+    "expected_tools": [
+      "search_alarm_history",
+      "search_policy_doc",
+      "recommend_work_order",
+      "audit_recommendation"
+    ],
+    "expected_agents": [
+      "alarm_agent",
+      "kb_agent",
+      "workorder_agent",
+      "auditor_agent"
+    ],
+    "expected_answer_contains": [
+      "AHU-2F-01",
+      "HVAC-MNT-001",
+      "filter",
+      "recurring"
+    ],
+    "must_not_contains": [
+      "WO-2026-0142"
+    ],
+    "must_not_do": [
+      "recommend wrong asset work order"
+    ],
+    "expected_behavior": [
+      "Query alarm history for AHU-2F-01 filter pressure pattern",
+      "Retrieve and cite HVAC-MNT-001 filter replacement policy",
+      "Recommend work order grounded in policy",
+      "Audit recommendation"
+    ],
+    "optional_tools": [
+      "search_similar_cases"
+    ]
+  },
+  {
+    "case_id": "rag_002",
+    "case_category": "rag",
+    "input": "For recurring supply air temperature alarms on AHU-3F-01, which maintenance policy governs escalation and work order priority?",
+    "expected_tools": [
+      "search_alarm_history",
+      "search_policy_doc",
+      "recommend_work_order",
+      "audit_recommendation"
+    ],
+    "expected_agents": [
+      "alarm_agent",
+      "kb_agent",
+      "workorder_agent",
+      "auditor_agent"
+    ],
+    "expected_answer_contains": [
+      "AHU-3F-01",
+      "HVAC-MNT-003",
+      "recurring",
+      "WO-2026-0142"
+    ],
+    "must_not_contains": [
+      "create a new work order"
+    ],
+    "must_not_do": [
+      "create duplicate work order for AHU-3F-01"
+    ],
+    "expected_behavior": [
+      "Confirm recurring supply air temperature pattern",
+      "Cite HVAC-MNT-003 escalation rules",
+      "Recommend escalating deferred WO-2026-0142",
+      "Audit recommendation"
+    ],
+    "optional_tools": [
+      "search_similar_cases"
+    ]
+  },
+  {
+    "case_id": "rag_003",
+    "case_category": "rag",
+    "input": "Has Floor 2 East AHU filter pressure been resolved before? Search similar cases and recommend next steps for AHU-2F-01.",
+    "expected_tools": [
+      "search_alarm_history",
+      "search_policy_doc",
+      "recommend_work_order",
+      "audit_recommendation"
+    ],
+    "expected_agents": [
+      "alarm_agent",
+      "kb_agent",
+      "workorder_agent",
+      "auditor_agent"
+    ],
+    "expected_answer_contains": [
+      "AHU-2F-01",
+      "filter",
+      "HVAC-MNT-001",
+      "similar"
+    ],
+    "must_not_contains": [
+      "WO-2026-0142"
+    ],
+    "must_not_do": [
+      "recommend wrong asset work order"
+    ],
+    "expected_behavior": [
+      "Search similar resolved cases for AHU-2F-01 filter pressure",
+      "Reference prior resolution WO-2026-0110",
+      "Ground recommendation in HVAC-MNT-001",
+      "Audit recommendation"
+    ],
+    "optional_tools": [
+      "search_similar_cases"
+    ]
+  },
+  {
+    "case_id": "rag_004",
+    "case_category": "rag",
+    "input": "Quote the exact escalation rule from HVAC-MNT-003 for recurring supply air temperature alarms on AHU-3F-01 and apply it to WO-2026-0142.",
+    "expected_tools": [
+      "search_alarm_history",
+      "search_policy_doc"
+    ],
+    "expected_agents": [
+      "alarm_agent",
+      "kb_agent",
+      "workorder_agent",
+      "auditor_agent"
+    ],
+    "expected_answer_contains": [
+      "HVAC-MNT-003",
+      "recurring",
+      "WO-2026-0142",
+      "escalate"
+    ],
+    "must_not_contains": [
+      "create a new work order"
+    ],
+    "must_not_do": [
+      "create duplicate work order for AHU-3F-01"
+    ],
+    "expected_behavior": [
+      "Retrieve and cite applicable HVAC-MNT-003 escalation/priority rules verbatim",
+      "Apply policy to escalate existing WO-2026-0142 (not create duplicate)",
+      "Audit recommendation"
+    ],
+    "optional_tools": [
+      "recommend_work_order",
+      "audit_recommendation"
+    ],
+    "expected_tool_args": {
+      "search_alarm_history": {"asset_id": "AHU-3F-01"}
+    },
+    "keyword_alternatives": {
+      "escalate": [
+        "escalation",
+        "escalate existing",
+        "increase priority",
+        "raise priority",
+        "higher priority",
+        "high priority"
+      ]
+    }
+  },
+  {
+    "case_id": "rag_005",
+    "case_category": "rag",
+    "input": "What does HVAC-MNT-001 say about filter replacement for AHU units? Cite policy rules only  - no work order needed yet.",
+    "expected_tools": [
+      "search_policy_doc"
+    ],
+    "expected_agents": [
+      "alarm_agent",
+      "kb_agent",
+      "workorder_agent",
+      "auditor_agent"
+    ],
+    "expected_answer_contains": [
+      "HVAC-MNT-001",
+      "filter",
+      "90 days"
+    ],
+    "must_not_contains": [],
+    "must_not_do": [
+      "invent policy rules not in HVAC-MNT-001"
+    ],
+    "expected_behavior": [
+      "Retrieve HVAC-MNT-001 via policy search",
+      "Cite filter replacement schedule rules",
+      "Avoid inventing unsupported policy text"
+    ],
+    "optional_tools": [
+      "search_alarm_history",
+      "recommend_work_order",
+      "audit_recommendation"
+    ]
+  }
+]

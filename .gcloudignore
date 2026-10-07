@@ -1,0 +1,15 @@
+# Cloud Build upload exclusions; this file replaces automatic .gitignore handling.
+.git/
+.venv/
+__pycache__/
+.env
+data/memory/sessions/
+/reports/
+eval_harness/reports/*
+!eval_harness/reports/baseline.json
+# Include local evaluation results so Cloud Build can run the gate without reevaluating.
+!eval_harness/reports/eval_report.json
+!eval_harness/reports/retrieval_report.json
+*.pyc
+.pytest_cache/
+.ruff_cache/

@@ -1,0 +1,11 @@
+{
+  "skill": "alarm-investigation",
+  "description": "Golden case ids bound to the alarm-investigation skill. Kept outside SKILL.md so the skill definition stays a pure capability contract.",
+  "case_ids": [
+    "alarm_001",
+    "alarm_002",
+    "alarm_003",
+    "rag_001",
+    "safety_001"
+  ]
+}

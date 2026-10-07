@@ -1,0 +1,104 @@
+[
+  {
+    "case_id": "a2a_timeout_001",
+    "case_category": "failure",
+    "input": "Investigate recurring AHU-3F-01 alarms and recommend work order action. Simulate remote WorkOrder A2A timeout.",
+    "expected_tools": [
+      "search_alarm_history",
+      "search_policy_doc",
+      "recommend_work_order",
+      "audit_recommendation"
+    ],
+    "expected_agents": [
+      "alarm_agent",
+      "kb_agent",
+      "workorder_agent",
+      "auditor_agent"
+    ],
+    "expected_answer_contains": [
+      "AHU-3F-01",
+      "fallback"
+    ],
+    "must_not_contains": [],
+    "must_not_do": [
+      "crash on A2A timeout"
+    ],
+    "expected_behavior": [
+      "Root calls remote WorkOrder over A2A",
+      "On timeout, retry then fall back to local recommend_work_order",
+      "Return a controlled recommendation rather than an unhandled exception"
+    ],
+    "optional_tools": [
+      "search_similar_cases"
+    ],
+    "notes": "Sprint 7 A2A-specific failure case; requires USE_A2A_WORKORDER=1 and WORKORDER_A2A_FAULT=timeout for injection."
+  },
+  {
+    "case_id": "a2a_unavailable_001",
+    "case_category": "failure",
+    "input": "For AHU-3F-01 recurring supply air temp, recommend WO when remote WorkOrder A2A is unavailable.",
+    "expected_tools": [
+      "search_alarm_history",
+      "search_policy_doc",
+      "recommend_work_order",
+      "audit_recommendation"
+    ],
+    "expected_agents": [
+      "alarm_agent",
+      "kb_agent",
+      "workorder_agent",
+      "auditor_agent"
+    ],
+    "expected_answer_contains": [
+      "AHU-3F-01",
+      "fallback"
+    ],
+    "must_not_contains": [],
+    "must_not_do": [
+      "crash on A2A unavailable"
+    ],
+    "expected_behavior": [
+      "Remote WorkOrder returns unavailable",
+      "Client retries then falls back locally",
+      "Recommendation remains grounded in ticket/policy tools"
+    ],
+    "optional_tools": [
+      "search_similar_cases"
+    ],
+    "notes": "Sprint 7 A2A-specific; inject with WORKORDER_A2A_FAULT=unavailable."
+  },
+  {
+    "case_id": "a2a_invalid_001",
+    "case_category": "failure",
+    "input": "Recommend work order for AHU-3F-01 when remote WorkOrder A2A returns an invalid response body.",
+    "expected_tools": [
+      "search_alarm_history",
+      "search_policy_doc",
+      "recommend_work_order",
+      "audit_recommendation"
+    ],
+    "expected_agents": [
+      "alarm_agent",
+      "kb_agent",
+      "workorder_agent",
+      "auditor_agent"
+    ],
+    "expected_answer_contains": [
+      "AHU-3F-01",
+      "fallback"
+    ],
+    "must_not_contains": [],
+    "must_not_do": [
+      "crash on invalid A2A response"
+    ],
+    "expected_behavior": [
+      "Invalid A2A payload is detected",
+      "Agent falls back to local recommend_work_order",
+      "No unhandled exception escapes the pipeline"
+    ],
+    "optional_tools": [
+      "search_similar_cases"
+    ],
+    "notes": "Sprint 7 A2A-specific; inject with WORKORDER_A2A_FAULT=invalid."
+  }
+]

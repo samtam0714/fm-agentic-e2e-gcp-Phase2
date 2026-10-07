@@ -1,0 +1,21 @@
+.venv/
+.git/
+.env
+.env.*
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+.cursor/
+terminals/
+
+# Runtime-generated artifacts (not needed in image)
+eval_harness/reports/
+data/memory/sessions/
+reports/
+
+# Dev / docs (not needed at runtime)
+tests/
+doc/
+*.md
+!data/mock/README.md

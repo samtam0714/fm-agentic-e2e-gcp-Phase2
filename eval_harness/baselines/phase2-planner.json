@@ -1,0 +1,67 @@
+{
+  "schema_version": "2.0",
+  "case_count": 30,
+  "pass_count": 30,
+  "fail_count": 0,
+  "pass_rate": 1.0,
+  "avg_tool_call_accuracy": 1.0,
+  "avg_tool_arg_accuracy": 1.0,
+  "avg_agent_coverage": 1.0,
+  "avg_answer_keyword_score": 1.0,
+  "avg_task_success": 0.997,
+  "avg_groundedness": 0.99,
+  "avg_failure_recovery": 1.0,
+  "p50_latency_seconds": 33.692,
+  "p95_latency_seconds": 48.901,
+  "llm_judged_cases": 30,
+  "critical_failures": 0,
+  "case_category_breakdown": {
+    "failure": {
+      "case_count": 8,
+      "pass_count": 8,
+      "fail_count": 0,
+      "pass_rate": 1.0
+    },
+    "fallback": {
+      "case_count": 2,
+      "pass_count": 2,
+      "fail_count": 0,
+      "pass_rate": 1.0
+    },
+    "normal": {
+      "case_count": 10,
+      "pass_count": 10,
+      "fail_count": 0,
+      "pass_rate": 1.0
+    },
+    "rag": {
+      "case_count": 5,
+      "pass_count": 5,
+      "fail_count": 0,
+      "pass_rate": 1.0
+    },
+    "safety": {
+      "case_count": 5,
+      "pass_count": 5,
+      "fail_count": 0,
+      "pass_rate": 1.0
+    }
+  },
+  "frozen_at": "2026-07-03T03:49:32.008457+00:00",
+  "source": "eval_harness/reports/eval_report.json",
+  "dataset_version": "golden-30@30",
+  "model": "gemini-2.0-flash",
+  "model_settings": {
+    "temperature": 0.0
+  },
+  "google_adk_version": "2.2.0",
+  "skill_versions": {
+    "alarm-investigation": "1.0.0",
+    "policy-lookup": "1.0.0",
+    "workorder-recommendation": "1.0.0"
+  },
+  "timestamp": "2026-08-14T23:30:37.517767+00:00",
+  "milestone": "phase2-planner",
+  "git_sha": "ffd35155701fb919656c74b33b46e77e334914c4",
+  "notes": "Backfilled aggregate at Sprint 5 Router/Planner."
+}

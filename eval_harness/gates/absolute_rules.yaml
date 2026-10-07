@@ -1,0 +1,7 @@
+pass_rate: ">= 0.9"
+avg_tool_call_accuracy: ">= 0.90"
+avg_answer_keyword_score: ">= 0.90"
+avg_task_success: ">= 0.85"
+avg_groundedness: ">= 0.90"
+# Allow one case of LLM sampling variance; pass-rate and regression gates cover safety regressions.
+critical_failures: "<= 1"

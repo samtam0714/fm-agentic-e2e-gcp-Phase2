@@ -1,0 +1,9 @@
+{
+  "skill": "policy-lookup",
+  "description": "Golden case ids bound to the policy-lookup skill. Kept outside SKILL.md so the skill definition stays a pure capability contract.",
+  "case_ids": [
+    "rag_001",
+    "rag_002",
+    "fail_003"
+  ]
+}

@@ -1,0 +1,128 @@
+{
+  "case_count": 5,
+  "pass_count": 5,
+  "fail_count": 0,
+  "pass_rate": 1.0,
+  "avg_recall_at_k": 1.0,
+  "avg_mean_relevance": 0.3133,
+  "avg_keyword_recall_at_k": 1.0,
+  "avg_groundedness_vector": 1.0,
+  "avg_groundedness_keyword": 1.0,
+  "groundedness_delta": 0.0,
+  "k": 3,
+  "cases": [
+    {
+      "case_id": "retrieval_001",
+      "pass": true,
+      "recall_at_k": 1.0,
+      "mean_relevance": 0.4667,
+      "retrieved_ids": [
+        "case_002",
+        "case_001",
+        "case_004"
+      ],
+      "relevant_case_ids": [
+        "case_001"
+      ],
+      "banned_hits": [],
+      "k": 3,
+      "keyword_recall_at_k": 1.0,
+      "keyword_retrieved_ids": [
+        "case_001",
+        "case_002"
+      ],
+      "groundedness_vector": 1.0,
+      "groundedness_keyword": 1.0,
+      "groundedness_delta": 0.0
+    },
+    {
+      "case_id": "retrieval_002",
+      "pass": true,
+      "recall_at_k": 1.0,
+      "mean_relevance": 0.3333,
+      "retrieved_ids": [
+        "case_003",
+        "case_002",
+        "case_004"
+      ],
+      "relevant_case_ids": [
+        "case_003"
+      ],
+      "banned_hits": [],
+      "k": 3,
+      "keyword_recall_at_k": 1.0,
+      "keyword_retrieved_ids": [
+        "case_003",
+        "case_002"
+      ],
+      "groundedness_vector": 1.0,
+      "groundedness_keyword": 1.0,
+      "groundedness_delta": 0.0
+    },
+    {
+      "case_id": "retrieval_003",
+      "pass": true,
+      "recall_at_k": 1.0,
+      "mean_relevance": 0.4333,
+      "retrieved_ids": [
+        "case_002",
+        "case_001",
+        "case_004"
+      ],
+      "relevant_case_ids": [
+        "case_002"
+      ],
+      "banned_hits": [],
+      "k": 3,
+      "keyword_recall_at_k": 1.0,
+      "keyword_retrieved_ids": [
+        "case_002",
+        "case_001",
+        "case_004"
+      ],
+      "groundedness_vector": 1.0,
+      "groundedness_keyword": 1.0,
+      "groundedness_delta": 0.0
+    },
+    {
+      "case_id": "retrieval_004",
+      "pass": true,
+      "recall_at_k": 1.0,
+      "mean_relevance": 0.0,
+      "retrieved_ids": [],
+      "relevant_case_ids": [],
+      "banned_hits": [],
+      "k": 3,
+      "keyword_recall_at_k": 1.0,
+      "keyword_retrieved_ids": [],
+      "groundedness_vector": 1.0,
+      "groundedness_keyword": 1.0,
+      "groundedness_delta": 0.0
+    },
+    {
+      "case_id": "retrieval_005",
+      "pass": true,
+      "recall_at_k": 1.0,
+      "mean_relevance": 0.3333,
+      "retrieved_ids": [
+        "case_004",
+        "case_002",
+        "case_001"
+      ],
+      "relevant_case_ids": [
+        "case_004"
+      ],
+      "banned_hits": [],
+      "k": 3,
+      "keyword_recall_at_k": 1.0,
+      "keyword_retrieved_ids": [
+        "case_004",
+        "case_002",
+        "case_001"
+      ],
+      "groundedness_vector": 1.0,
+      "groundedness_keyword": 1.0,
+      "groundedness_delta": 0.0
+    }
+  ]
+}

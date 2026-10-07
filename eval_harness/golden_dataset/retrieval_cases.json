@@ -1,0 +1,69 @@
+[
+  {
+    "case_id": "retrieval_001",
+    "case_category": "retrieval",
+    "description": "Synonym paraphrase: clogged filter → filter pressure case (no shared 'clogged' token in corpus).",
+    "query": "clogged AHU filter making building overheat",
+    "relevant_case_ids": ["case_001"],
+    "graded_relevance": [
+      {"case_id": "case_001", "relevance": 1.0},
+      {"case_id": "case_002", "relevance": 0.4}
+    ],
+    "must_not_retrieve": [],
+    "min_recall_at_k": 1.0,
+    "k": 3
+  },
+  {
+    "case_id": "retrieval_002",
+    "case_category": "retrieval",
+    "description": "Cross-term: low airflow / draught → VAV critical case.",
+    "query": "conference room draught and weak airflow actuator issue",
+    "relevant_case_ids": ["case_003"],
+    "graded_relevance": [
+      {"case_id": "case_003", "relevance": 1.0}
+    ],
+    "must_not_retrieve": [],
+    "min_recall_at_k": 1.0,
+    "k": 3
+  },
+  {
+    "case_id": "retrieval_003",
+    "case_category": "retrieval",
+    "description": "Synonym for recurring supply-air temperature alarms.",
+    "query": "repeated overheating alarms on floor 3 air handler",
+    "relevant_case_ids": ["case_002"],
+    "graded_relevance": [
+      {"case_id": "case_002", "relevance": 1.0},
+      {"case_id": "case_001", "relevance": 0.3}
+    ],
+    "must_not_retrieve": [],
+    "min_recall_at_k": 1.0,
+    "k": 3
+  },
+  {
+    "case_id": "retrieval_004",
+    "case_category": "retrieval",
+    "description": "Irrelevant query should not surface HVAC cases as high-confidence must-haves; ban unrelated forced hits via empty relevant + soft check.",
+    "query": "employee badge printer toner refill procedure",
+    "relevant_case_ids": [],
+    "graded_relevance": [],
+    "must_not_retrieve": ["case_001", "case_002", "case_003", "case_004"],
+    "min_recall_at_k": 1.0,
+    "k": 3,
+    "allow_empty": true,
+    "notes": "With min_score filter, unrelated queries should return no HVAC cases."
+  },
+  {
+    "case_id": "retrieval_005",
+    "case_category": "retrieval",
+    "description": "Transient spike paraphrase → monitor/no-WO case.",
+    "query": "single temperature spike no repeat within a month",
+    "relevant_case_ids": ["case_004"],
+    "graded_relevance": [
+      {"case_id": "case_004", "relevance": 1.0}
+    ],
+    "must_not_retrieve": [],
+    "min_recall_at_k": 1.0,
+    "k": 3
+  }
+]

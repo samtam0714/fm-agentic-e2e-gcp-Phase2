@@ -1,0 +1,62 @@
+[
+  {
+    "case_id": "case_001",
+    "case_type": "recurring_hvac_alarm",
+    "asset_id": "AHU-2F-01",
+    "asset_type": "AHU",
+    "site": "Toronto",
+    "customer_id": "DemoCorp",
+    "alarm_type": "filter_pressure_high",
+    "summary": "Recurring filter pressure alarms on Floor 2 East AHU resolved by scheduled filter replacement.",
+    "resolution": "Create medium priority work order; filter replaced on 2026-05-19.",
+    "work_order_id": "WO-2026-0110",
+    "policy_id": "HVAC-MNT-001",
+    "keywords": ["filter", "AHU", "recurring", "pressure"],
+    "resolved_at": "2026-05-19T16:00:00Z"
+  },
+  {
+    "case_id": "case_002",
+    "case_type": "recurring_hvac_alarm",
+    "asset_id": "AHU-3F-01",
+    "asset_type": "AHU",
+    "site": "Toronto",
+    "customer_id": "DemoCorp",
+    "alarm_type": "high_supply_air_temp",
+    "summary": "Active recurring supply air temperature alarms on AHU-3F-01; open work order deferred once.",
+    "resolution": "Pending  - policy HVAC-MNT-003 recommends filter inspection and medium priority WO.",
+    "work_order_id": "WO-2026-0142",
+    "policy_id": "HVAC-MNT-003",
+    "keywords": ["recurring", "supply air temp", "filter", "floor 3"],
+    "resolved_at": null
+  },
+  {
+    "case_id": "case_003",
+    "case_type": "critical_vav_alarm",
+    "asset_id": "VAV-3F-12",
+    "asset_type": "VAV",
+    "site": "Toronto",
+    "customer_id": "DemoCorp",
+    "alarm_type": "low_airflow",
+    "summary": "Critical low airflow in conference room VAV; actuator replacement in progress.",
+    "resolution": "High priority work order WO-2026-0158 in progress.",
+    "work_order_id": "WO-2026-0158",
+    "policy_id": null,
+    "keywords": ["VAV", "low airflow", "conference", "critical"],
+    "resolved_at": null
+  },
+  {
+    "case_id": "case_004",
+    "case_type": "transient_alarm",
+    "asset_id": "AHU-3F-02",
+    "asset_type": "AHU",
+    "site": "Toronto",
+    "customer_id": "DemoCorp",
+    "alarm_type": "high_supply_air_temp",
+    "summary": "Single transient temperature spike; no recurrence within 30 days.",
+    "resolution": "No work order required; cancelled WO-2026-0099 after monitoring.",
+    "work_order_id": "WO-2026-0099",
+    "policy_id": null,
+    "keywords": ["transient", "monitor", "no recurrence"],
+    "resolved_at": "2026-05-22T11:00:00Z"
+  }
+]

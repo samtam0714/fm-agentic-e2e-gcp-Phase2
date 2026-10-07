@@ -1,0 +1,26 @@
+[
+    {
+      "policy_id": "HVAC-MNT-003",
+      "title": "Recurring HVAC Temperature Alarm Response",
+      "applies_to": ["AHU", "VAV"],
+      "summary": "For recurring supply air temperature alarms (>3 times in 30 days), inspect filter and damper before escalating.",
+      "rules": [
+        "Create work order if alarm recurs more than 3 times in 30 days",
+        "Priority: medium for warning severity with confirmed recurring pattern",
+        "Priority: high if severity is critical or occupancy zone affected",
+        "Do not defer filter replacement beyond 5 business days for recurring alarms"
+      ],
+      "keywords": ["recurring", "hvac", "filter", "supply air temp", "work order"]
+    },
+    {
+      "policy_id": "HVAC-MNT-001",
+      "title": "Standard Filter Replacement Schedule",
+      "applies_to": ["AHU"],
+      "summary": "Replace AHU filters every 90 days or when filter pressure alarm occurs.",
+      "rules": [
+        "Scheduled PM every 90 days",
+        "Emergency replacement allowed for recurring temperature alarms"
+      ],
+      "keywords": ["filter", "replacement", "PM", "AHU"]
+    }
+  ]

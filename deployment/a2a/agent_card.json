@@ -1,0 +1,43 @@
+{
+  "name": "FM AgentOps WorkOrder Agent",
+  "description": "Recommend create / escalate / monitor / no_action for maintenance work orders after alarm and policy context are available.",
+  "url": "http://127.0.0.1:8091/",
+  "version": "1.0.0",
+  "protocolVersion": "0.3.0",
+  "preferredTransport": "HTTP+JSON",
+  "defaultInputModes": ["text"],
+  "defaultOutputModes": ["text"],
+  "capabilities": {
+    "streaming": false,
+    "pushNotifications": false
+  },
+  "skills": [
+    {
+      "id": "workorder-recommendation",
+      "name": "Work Order Recommendation",
+      "description": "Triage a building asset into create_new / escalate_existing / use_existing / no_action using ticket and policy evidence.",
+      "tags": ["workorder", "ticket", "facilities", "fm-agentops"],
+      "examples": [
+        "Escalate the open work order for AHU-3F-01 after recurring supply air temp alarms.",
+        "Recommend create vs monitor for VAV-3F-12 low airflow."
+      ],
+      "inputModes": ["text"],
+      "outputModes": ["text"]
+    }
+  ],
+  "provider": {
+    "organization": "FM AgentOps",
+    "url": "https://example.com/fm-agentops"
+  },
+  "additionalInterfaces": [
+    {
+      "url": "http://127.0.0.1:8091/a2a/v1/message:send",
+      "transport": "HTTP+JSON"
+    }
+  ],
+  "metadata": {
+    "trace_header": "X-Trace-Id",
+    "service": "workorder-a2a",
+    "output_key": "work_order_recommendation"
+  }
+}

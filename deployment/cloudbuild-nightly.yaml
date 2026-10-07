@@ -1,0 +1,46 @@
+# FM AgentOps Phase 2 - Nightly eval (Sprint 2.2.5)
+#
+# Scheduled by Cloud Scheduler to run the full golden evaluation and regression gate.
+# This monitoring job evaluates and gates only; it does not build or deploy.
+#
+# Manual invocation:
+#   gcloud builds submit --config=deployment/cloudbuild-nightly.yaml
+#
+# See scripts/setup_nightly_scheduler.sh to schedule a daily 08:00 UTC run.
+#
+# The nightly run executes all 30 cases (about 40+ minutes) and requires Vertex quota.
+# A generous timeout and inter-case backoff are configured; gate failures fail the build.
+
+substitutions:
+  _REGION: us-central1
+  _EVAL_DATASET: all
+
+options:
+  logging: CLOUD_LOGGING_ONLY
+  machineType: E2_HIGHCPU_8
+timeout: 4800s
+
+steps:
+  - id: nightly-eval-gate
+    name: python:3.11-slim-bookworm
+    entrypoint: bash
+    args:
+      - -c
+      - |
+        set -euo pipefail
+        apt-get update -qq
+        apt-get install -y --no-install-recommends ca-certificates git curl
+        pip install --no-cache-dir uv
+        uv --version
+        test -f uv.lock || { echo "[nightly] BLOCK: uv.lock is missing"; exit 1; }
+        test -f eval_harness/reports/baseline.json || { echo "[nightly] BLOCK: baseline.json is missing"; exit 1; }
+        bash scripts/nightly_eval.sh
+    env:
+      - GOOGLE_CLOUD_PROJECT=$PROJECT_ID
+      - GOOGLE_CLOUD_LOCATION=${_REGION}
+      - GOOGLE_GENAI_USE_VERTEXAI=true
+      - EVAL_DATASET=${_EVAL_DATASET}
+      - EVAL_CASE_DELAY_SECONDS=90
+      - EVAL_CASE_MAX_RETRIES=12
+      - EVAL_CASE_RETRY_MAX_WAIT=600
+      - EVAL_RATE_LIMIT_COOLDOWN=180

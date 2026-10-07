@@ -1,0 +1,359 @@
+[
+  {
+    "case_id": "alarm_001",
+    "input": "The HVAC alarm on Floor 3 keeps recurring. Check the issue, search policy, decide if we should create a work order, and recommend priority.",
+    "expected_tools": [
+      "search_alarm_history",
+      "search_policy_doc",
+      "recommend_work_order",
+      "audit_recommendation"
+    ],
+    "expected_agents": [
+      "alarm_agent",
+      "kb_agent",
+      "workorder_agent",
+      "auditor_agent"
+    ],
+    "expected_answer_contains": [
+      "AHU-3F-01",
+      "recurring",
+      "HVAC-MNT-003",
+      "WO-2026-0142",
+      "escalate"
+    ],
+    "must_not_contains": [
+      "create a new work order"
+    ],
+    "must_not_do": [
+      "create a new work order without checking existing"
+    ],
+    "expected_behavior": [
+      "Check historical alarm frequency on Floor 3",
+      "Retrieve HVAC maintenance policy",
+      "Escalate existing WO-2026-0142 rather than creating duplicate",
+      "Audit recommendation for groundedness"
+    ]
+  },
+  {
+    "case_id": "alarm_002",
+    "input": "VAV-3F-12 in the Floor 3 conference room has critical low airflow alarms. Investigate history, check policy, and recommend work order action.",
+    "expected_tools": [
+      "search_alarm_history",
+      "search_policy_doc",
+      "recommend_work_order",
+      "audit_recommendation"
+    ],
+    "expected_agents": [
+      "alarm_agent",
+      "kb_agent",
+      "workorder_agent",
+      "auditor_agent"
+    ],
+    "expected_answer_contains": [
+      "VAV-3F-12",
+      "low airflow",
+      "WO-2026-0158",
+      "conference"
+    ],
+    "must_not_contains": [
+      "create a new work order"
+    ],
+    "must_not_do": [
+      "create duplicate work order for VAV-3F-12"
+    ],
+    "expected_behavior": [
+      "Identify VAV-3F-12 low airflow issue",
+      "Reference applicable HVAC policy",
+      "Use existing in-progress WO-2026-0158",
+      "Audit recommendation"
+    ],
+    "expected_tool_args": {
+      "search_alarm_history": {"asset_id": "VAV-3F-12"},
+      "recommend_work_order": {"asset_id": "VAV-3F-12"}
+    }
+  },
+  {
+    "case_id": "alarm_003",
+    "input": "AHU-3F-02 on Floor 3 South had a temperature alarm. Is this recurring? Should we open a work order?",
+    "expected_tools": [
+      "search_alarm_history",
+      "search_policy_doc",
+      "recommend_work_order",
+      "audit_recommendation"
+    ],
+    "expected_agents": [
+      "alarm_agent",
+      "kb_agent",
+      "workorder_agent",
+      "auditor_agent"
+    ],
+    "expected_answer_contains": [
+      "AHU-3F-02",
+      "not recurring",
+      "monitor"
+    ],
+    "must_not_contains": [
+      "create a new work order"
+    ],
+    "must_not_do": [
+      "create work order for single transient alarm"
+    ],
+    "expected_behavior": [
+      "Confirm only one recent event for AHU-3F-02",
+      "Explain alarm is not recurring",
+      "Recommend monitoring rather than new work order",
+      "Audit recommendation"
+    ],
+    "expected_tool_args": {
+      "search_alarm_history": {"asset_id": "AHU-3F-02"},
+      "recommend_work_order": {"asset_id": "AHU-3F-02"}
+    }
+  },
+  {
+    "case_id": "alarm_004",
+    "input": "Filter pressure alarms on AHU-2F-01 in the Floor 2 East wing are recurring again. Investigate and recommend whether to create a work order.",
+    "expected_tools": [
+      "search_alarm_history",
+      "search_policy_doc",
+      "recommend_work_order",
+      "audit_recommendation"
+    ],
+    "expected_agents": [
+      "alarm_agent",
+      "kb_agent",
+      "workorder_agent",
+      "auditor_agent"
+    ],
+    "expected_answer_contains": [
+      "AHU-2F-01",
+      "recurring",
+      "HVAC-MNT-001",
+      "create"
+    ],
+    "must_not_contains": [
+      "WO-2026-0142"
+    ],
+    "must_not_do": [
+      "recommend wrong asset work order"
+    ],
+    "expected_behavior": [
+      "Identify recurring filter pressure pattern on AHU-2F-01",
+      "Retrieve filter replacement policy HVAC-MNT-001",
+      "Recommend creating a new work order because prior WO is closed",
+      "Audit recommendation"
+    ],
+    "expected_tool_args": {
+      "search_alarm_history": {"asset_id": "AHU-2F-01"},
+      "recommend_work_order": {"asset_id": "AHU-2F-01"}
+    }
+  },
+  {
+    "case_id": "alarm_005",
+    "input": "Search alarm history for asset AHU-3F-01, review policy, and tell me if work order WO-2026-0142 should be escalated.",
+    "expected_tools": [
+      "search_alarm_history",
+      "search_policy_doc",
+      "recommend_work_order",
+      "audit_recommendation"
+    ],
+    "expected_agents": [
+      "alarm_agent",
+      "kb_agent",
+      "workorder_agent",
+      "auditor_agent"
+    ],
+    "expected_answer_contains": [
+      "AHU-3F-01",
+      "WO-2026-0142",
+      "escalate",
+      "P1"
+    ],
+    "must_not_contains": [
+      "create a new work order"
+    ],
+    "must_not_do": [
+      "create duplicate work order for AHU-3F-01"
+    ],
+    "expected_behavior": [
+      "Query alarm history directly by asset_id",
+      "Confirm recurring P1 pattern",
+      "Recommend escalating deferred WO-2026-0142",
+      "Audit recommendation"
+    ],
+    "expected_tool_args": {
+      "search_alarm_history": {"asset_id": "AHU-3F-01"},
+      "recommend_work_order": {"asset_id": "AHU-3F-01"}
+    }
+  },
+  {
+    "case_id": "alarm_006",
+    "input": "Toronto site AHU-2F-01 filter pressure is recurring again. Check WO-2026-0110 status and recommend next work order action.",
+    "expected_tools": [
+      "search_alarm_history",
+      "search_policy_doc",
+      "recommend_work_order",
+      "audit_recommendation"
+    ],
+    "expected_agents": [
+      "alarm_agent",
+      "kb_agent",
+      "workorder_agent",
+      "auditor_agent"
+    ],
+    "expected_answer_contains": [
+      "AHU-2F-01",
+      "WO-2026-0110",
+      "completed",
+      "HVAC-MNT-001",
+      "create"
+    ],
+    "must_not_contains": [
+      "WO-2026-0142"
+    ],
+    "must_not_do": [
+      "recommend wrong asset work order"
+    ],
+    "expected_behavior": [
+      "Confirm prior WO-2026-0110 is completed",
+      "Apply HVAC-MNT-001 for recurring filter pressure",
+      "Recommend new work order because active WO is closed",
+      "Audit recommendation"
+    ]
+  },
+  {
+    "case_id": "alarm_007",
+    "input": "Scan Floor 3 alarms and identify any assets with recurring patterns that need work order review.",
+    "expected_tools": [
+      "search_alarm_history",
+      "search_policy_doc",
+      "recommend_work_order",
+      "audit_recommendation"
+    ],
+    "expected_agents": [
+      "alarm_agent",
+      "kb_agent",
+      "workorder_agent",
+      "auditor_agent"
+    ],
+    "expected_answer_contains": [
+      "Floor 3",
+      "recurring",
+      "AHU-3F-01"
+    ],
+    "must_not_contains": [],
+    "must_not_do": [
+      "ignore recurring AHU-3F-01 pattern on Floor 3"
+    ],
+    "expected_behavior": [
+      "Search alarm history by floor",
+      "Surface recurring assets on Floor 3",
+      "Recommend appropriate work order action for top recurring issue",
+      "Audit recommendation"
+    ],
+    "optional_tools": [
+      "search_similar_cases"
+    ]
+  },
+  {
+    "case_id": "alarm_008",
+    "input": "AHU-3F-01 has seven events in 30 days with P1 priority. Review policy and confirm whether WO-2026-0142 priority should increase.",
+    "expected_tools": [
+      "search_alarm_history",
+      "search_policy_doc",
+      "recommend_work_order",
+      "audit_recommendation"
+    ],
+    "expected_agents": [
+      "alarm_agent",
+      "kb_agent",
+      "workorder_agent",
+      "auditor_agent"
+    ],
+    "expected_answer_contains": [
+      "AHU-3F-01",
+      "7",
+      "P1",
+      "WO-2026-0142",
+      "escalate"
+    ],
+    "must_not_contains": [
+      "create a new work order"
+    ],
+    "must_not_do": [
+      "create duplicate work order for AHU-3F-01"
+    ],
+    "expected_behavior": [
+      "Confirm high event count and P1 severity",
+      "Apply HVAC-MNT-003 escalation rules",
+      "Recommend escalating WO-2026-0142 priority",
+      "Audit recommendation"
+    ]
+  },
+  {
+    "case_id": "alarm_009",
+    "input": "Investigate AHU-3F-02 temperature alarm history and tell me if a work order is warranted.",
+    "expected_tools": [
+      "search_alarm_history",
+      "search_policy_doc",
+      "recommend_work_order",
+      "audit_recommendation"
+    ],
+    "expected_agents": [
+      "alarm_agent",
+      "kb_agent",
+      "workorder_agent",
+      "auditor_agent"
+    ],
+    "expected_answer_contains": [
+      "AHU-3F-02",
+      "not recurring",
+      "monitor"
+    ],
+    "must_not_contains": [
+      "create a new work order"
+    ],
+    "must_not_do": [
+      "create work order for single transient alarm"
+    ],
+    "expected_behavior": [
+      "Confirm single recent event for AHU-3F-02",
+      "Recommend monitoring rather than new work order",
+      "Audit recommendation"
+    ]
+  },
+  {
+    "case_id": "alarm_010",
+    "input": "For DemoCorp Toronto, summarize open HVAC issues on Floor 3 and recommend work order actions for the highest priority recurring asset.",
+    "expected_tools": [
+      "search_alarm_history",
+      "search_policy_doc",
+      "recommend_work_order",
+      "audit_recommendation"
+    ],
+    "expected_agents": [
+      "alarm_agent",
+      "kb_agent",
+      "workorder_agent",
+      "auditor_agent"
+    ],
+    "expected_answer_contains": [
+      "Toronto",
+      "Floor 3",
+      "AHU-3F-01",
+      "recurring"
+    ],
+    "must_not_contains": [],
+    "must_not_do": [
+      "ignore highest priority recurring asset on Floor 3"
+    ],
+    "expected_behavior": [
+      "Query alarms for Toronto Floor 3",
+      "Prioritize recurring AHU-3F-01 issue",
+      "Recommend work order action grounded in policy",
+      "Audit recommendation"
+    ],
+    "optional_tools": [
+      "search_similar_cases"
+    ]
+  }
+]

@@ -1,0 +1,14 @@
+# Regression gate vs the active milestone baseline (Phase 2).
+# Update baseline_path when freezing a new milestone under eval_harness/baselines/.
+baseline_path: eval_harness/baselines/phase2-adk-skills.json
+active_milestone: phase2-adk-skills
+
+# Max degradation vs that baseline.
+# Drop metrics: baseline - current must satisfy the threshold (lower drop is better).
+avg_task_success_drop: "<= 0.03"
+avg_groundedness_drop: "<= 0.03"
+pass_rate_drop: "<= 0.03"
+# Relative latency increase: (current - baseline) / baseline
+p95_latency_increase: "<= 0.20"
+# New critical failures compared to baseline
+critical_failures_new: "<= 0"

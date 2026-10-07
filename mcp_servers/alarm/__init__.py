@@ -1,0 +1,1 @@
+"""Alarm MCP server package."""
