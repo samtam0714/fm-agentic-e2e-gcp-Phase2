@@ -34,83 +34,51 @@ These remain roadmap items; the README does not claim them as shipped.
 
 ## System architecture
 
-**Interview one-liner:** a building-ops question enters FastAPI, Root routes and plans, specialists gather evidence and recommend a work order, Auditor checks it, then every run is traced and scored so a bad agent version can be blocked before deploy.
-
-### 1) Request path (main story)
-
-Use this diagram first. Walk left to right.
-
-```mermaid
-flowchart LR
-    Q["User query<br/>Floor 3 HVAC keeps recurring"] --> API["FastAPI<br/>/v1/investigate"]
-    API --> Root["Root Agent"]
-    Root --> R["Router<br/>what kind of task?"]
-    R --> P["Planner<br/>what steps?"]
-    P --> E["Execute<br/>Alarm -> KB -> WorkOrder -> Auditor"]
-    E --> Out["Structured answer<br/>action + priority + audit"]
-    E --> Trace["Trace + metrics"]
-```
-
-What each stage does:
-
-| Stage | Job |
-|---|---|
-| Router | Classify the request (alarm / policy / work-order style work) |
-| Planner | Build a short plan: investigate -> policy -> recommend |
-| Alarm | Look up alarm history + similar past cases |
-| KB | Retrieve the matching policy / SOP |
-| WorkOrder | Recommend create / escalate / monitor / no-action |
-| Auditor | Check the recommendation is grounded and safe |
-| Recovery | On tool error/timeout: one bounded retry / replan |
-
-### 2) Tools behind the specialists
-
-Keep this as the "how do tools work?" follow-up.
+A building-ops question enters FastAPI. Root routes and plans, specialists gather evidence and recommend a work order, Auditor checks it, and every run is traced so quality and failures stay visible.
 
 ```mermaid
 flowchart TD
-    subgraph Specialists["Specialist agents"]
-      Alarm["Alarm Agent"]
-      KB["KB Agent"]
-      WO["WorkOrder Agent"]
-      Auditor["Auditor Agent"]
-    end
+    User["User / API Client<br/>building ops question"] --> Gateway["FastAPI Gateway<br/>/v1/investigate"]
+    Gateway --> Root["Root Agent<br/>central orchestrator"]
+    Root --> Router["Router Agent<br/>classify task type"]
+    Root --> Final["Structured Final Answer<br/>findings + policy + work order + audit"]
 
-    Alarm --> AlarmMCP["MCP: search_alarm_history"]
-    Alarm --> Mem["FAISS: search_similar_cases"]
-    KB --> PolicyMCP["MCP: search_policy_doc"]
-    WO --> Ticket["Tool: recommend_work_order"]
-    WO -.-> A2A["Optional Mini A2A remote WorkOrder"]
-    Auditor --> Audit["Tool: audit_recommendation"]
+    Router --> Planner["Planner Agent<br/>build execution plan"]
+    Planner --> Loop["Execution Loop<br/>run + failure recovery"]
+
+    Loop --> Alarm["Alarm Agent<br/>investigate alarm history"]
+    Loop --> KB["KB Agent<br/>look up policy / SOP"]
+    Loop --> WO["WorkOrder Agent<br/>recommend work-order action"]
+    Loop --> Auditor["Auditor Agent<br/>audit whether the recommendation is sound"]
+    Loop --> Recovery["Recovery Gate<br/>on tool error / timeout: retry or replan"]
+
+    Alarm --> AlarmMCP["Alarm MCP Tool<br/>search_alarm_history"]
+    Alarm --> VectorMem["Vector Memory<br/>search_similar_cases"]
+    KB --> PolicyMCP["Policy MCP Tool<br/>search_policy_doc"]
+    WO --> LocalWO["Local Tool<br/>recommend_work_order"]
+    WO -.-> RemoteWO["Remote WorkOrder Agent<br/>optional Mini A2A call"]
+    Auditor --> AuditTool["Audit Tool<br/>audit_recommendation"]
+
+    AlarmMCP --> Trace["Tracing / Logs"]
+    VectorMem --> Trace
+    PolicyMCP --> Trace
+    LocalWO --> Trace
+    RemoteWO --> Trace
+    AuditTool --> Trace
+    Recovery --> Trace
+    Trace --> Dash["Reliability Dashboard<br/>latency / error rate / pass rate / fallback rate"]
 ```
 
-Key talking points:
+Flow:
 
-- Business tools can run in-process or through **MCP servers** (`USE_MCP_TOOLS=1`).
-- Similar cases use **FAISS vector memory** (keyword fallback).
-- WorkOrder can stay local or call a **Mini A2A** remote agent with timeout + local fallback.
-- Skills (`SKILL.md` + `load_skill`) can activate tools on demand when `USE_ADK_SKILLS=1`.
+1. Request enters FastAPI `/v1/investigate`.
+2. Root uses Router to classify the task, then Planner to create a short plan.
+3. Execution Loop runs Alarm -> KB -> WorkOrder -> Auditor.
+4. Tools sit behind the specialists: MCP for alarm/policy, FAISS for similar cases, optional Mini A2A for remote WorkOrder.
+5. Recovery Gate handles tool error/timeout with one bounded retry or replan.
+6. Everything lands in traces and the reliability dashboard.
 
-### 3) Quality loop (why this is AgentOps, not just a demo)
-
-```mermaid
-flowchart LR
-    Run["Same investigate path<br/>API / CLI / eval"] --> Judge["Judges<br/>rule + LLM"]
-    Judge --> Report["eval_report.json<br/>30 golden cases"]
-    Report --> Abs["Absolute gate<br/>min quality"]
-    Report --> Reg["Regression gate<br/>vs baseline"]
-    Abs --> Decision{"PASS?"}
-    Reg --> Decision
-    Decision -->|yes| Deploy["Cloud Run deploy"]
-    Decision -->|no| Block["BLOCK release"]
-```
-
-Say this clearly in interview:
-
-1. I score the same path that production uses.
-2. Absolute gate checks minimum quality.
-3. Regression gate blocks silent degradation against a frozen baseline.
-4. Cloud Build only continues when the gate passes.
+The same investigate path is scored by the eval harness and absolute/regression gates before Cloud Run deploy.
 
 ## Evaluation and release discipline
 
